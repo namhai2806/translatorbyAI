@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"os"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
@@ -32,28 +31,28 @@ func createInputColumn(models []string) (*fyne.Container, func()) {
 func createInputTabs(models []string) *container.AppTabs {
 
 	tabs := container.NewAppTabs()
-	var tokenData tokenUsageData
-	tokenUsagePath, err := defaultTokenUsagePath()
-	if err != nil {
-		fmt.Println("Error finding token file:", err)
-	} else {
-		tokenFile, err := os.ReadFile(tokenUsagePath)
-		if err != nil {
-			fmt.Println("Error reading token file:", err)
-		} else if tokenData, err = decodeTokenUsageData(tokenFile); err != nil {
-			fmt.Println("Error parsing token file:", err)
-		}
-	}
+	//var tokenData tokenUsageData
+	// tokenUsagePath, err := defaultTokenUsagePath()
+	// if err != nil {
+	// 	fmt.Println("Error finding token file:", err)
+	// } else {
+	// 	tokenFile, err := os.ReadFile(tokenUsagePath)
+	// 	if err != nil {
+	// 		fmt.Println("Error reading token file:", err)
+	// 	} else if tokenData, err = decodeTokenUsageData(tokenFile); err != nil {
+	// 		fmt.Println("Error parsing token file:", err)
+	// 	}
+	// }
 
-	for _, model := range models {
-		tableCost := CostTable(tokenData, model)
-		tabs.Append(container.NewTabItemWithIcon(
-			model,
-			theme.DocumentIcon(),
-			container.NewStack(tableCost),
-		),
-		)
-	}
+	// for _, model := range models {
+	// 	tableCost := CostTable(tokenData, model)
+	// 	tabs.Append(container.NewTabItemWithIcon(
+	// 		model,
+	// 		theme.DocumentIcon(),
+	// 		container.NewStack(tableCost),
+	// 	),
+	// 	)
+	// }
 
 	priceModelColumn := container.NewVBox(widget.NewLabelWithStyle("Mô hình", fyne.TextAlignLeading, fyne.TextStyle{Bold: true}))
 	priceInputColumn := container.NewVBox(widget.NewLabelWithStyle("Input (USD)", fyne.TextAlignLeading, fyne.TextStyle{Bold: true}))
