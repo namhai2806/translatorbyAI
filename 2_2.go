@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+	"os"
 	"time"
 
 	"fyne.io/fyne/v2"
@@ -32,12 +34,55 @@ func row2_2(inputDirectory string, outDirectory string, historyPath string, myAp
 		content.Refresh()
 		popUp.Show()
 	})
+	var popUp2 *widget.PopUp
+	content2 := container.NewVBox()
+	popUp2 = widget.NewModalPopUp(content2, myWindow.Canvas())
+	popUp2.Resize(fyne.NewSize(1500, 700))
+	costHistory := widget.NewButton("Lịch sử chi phí", func() {
+		tabs := container.NewAppTabs()
+		tokenUsagePath, err := defaultTokenUsagePath()
+		if err != nil {
+			dialog.ShowError(fmt.Errorf("không thể tìm tệp thống kê chi phí: %w", err), myWindow)
+			return
+		}
+		tokenFile, err := os.ReadFile(tokenUsagePath)
+		if err != nil {
+			dialog.ShowError(fmt.Errorf("không thể đọc tệp thống kê chi phí: %w", err), myWindow)
+			return
+		}
+		tokenData, err := decodeTokenUsageData(tokenFile)
+		if err != nil {
+			dialog.ShowError(fmt.Errorf("không thể phân tích tệp thống kê chi phí: %w", err), myWindow)
+			return
+		}
+
+		for _, model := range models {
+			tableCost := CostTable(tokenData, model)
+			tabs.Append(container.NewTabItemWithIcon(
+				model,
+				theme.DocumentIcon(),
+				tableCost,
+			))
+		}
+		closeButton := widget.NewButton("Đóng", func() {
+			popUp2.Hide()
+		})
+		content2.Objects = []fyne.CanvasObject{
+			container.NewGridWithColumns(1,
+				container.NewCenter(closeButton),
+				tabs,
+			),
+		}
+		content2.Refresh()
+		popUp2.Show()
+	})
 
 	res := container.NewVBox(container.NewCenter(
 		container.NewHBox(
 			widget.NewButtonWithIcon("Mở thư mục tài liệu gốc", theme.FolderOpenIcon(), OpenDir(inputDirectory, myApp, myWindow)),
 			widget.NewButtonWithIcon("Mở thư mục tài liệu dịch", theme.FolderOpenIcon(), OpenDir(outDirectory, myApp, myWindow)),
 			open,
+			costHistory,
 		)))
 	return res
 }
